@@ -3467,6 +3467,13 @@ components:
           description: >
             The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
           type: string
+        rerank_hybrid_matches:
+          type: boolean
+          description: >
+            When true, computes both text match and vector distance scores for all matches in hybrid search.
+            Documents found only through keyword search will get a vector distance score, and
+            documents found only through vector search will get a text match score.
+          default: false
 
     MultiSearchParameters:
       description: >
@@ -3845,6 +3852,13 @@ components:
           description: >
             The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
           type: string
+        rerank_hybrid_matches:
+          type: boolean
+          description: >
+            When true, computes both text match and vector distance scores for all matches in hybrid search.
+            Documents found only through keyword search will get a vector distance score, and
+            documents found only through vector search will get a text match score.
+          default: false
     MultiSearchSearchesParameter:
       type: object
       required:
@@ -3870,13 +3884,6 @@ components:
             x-typesense-api-key:
               type: string
               description: A separate search API key for each search within a multi_search request
-            rerank_hybrid_matches:
-              type: boolean
-              description: >
-                When true, computes both text match and vector distance scores for all matches in hybrid search.
-                Documents found only through keyword search will get a vector distance score, and
-                documents found only through vector search will get a text match score.
-              default: false
     FacetCounts:
       type: object
       properties:

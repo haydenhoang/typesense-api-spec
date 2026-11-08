@@ -6358,6 +6358,34 @@
     },
     {
       "method": "GET",
+      "pathTemplate": "/health",
+      "handler": "get_health",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "source": {
+        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v31/src/main/typesense_server.cpp",
+        "line": 111,
+        "column": 5
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "POST",
+      "pathTemplate": "/health",
+      "handler": "post_health",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "source": {
+        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v31/src/main/typesense_server.cpp",
+        "line": 113,
+        "column": 5
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "GET",
       "pathTemplate": "/health_with_rusage",
       "handler": "get_health_with_resource_usage",
       "pathParams": [],

@@ -167,3 +167,4 @@ jobs:
           fi
 # test: second run, expect a commit on top of the hand edit
 # test: third run, expect no new commit
+# test: back to v30, expect the pull request to close

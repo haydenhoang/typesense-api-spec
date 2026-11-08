@@ -165,3 +165,4 @@ jobs:
             gh pr create --repo "$GITHUB_REPOSITORY" --base "$GITHUB_REF_NAME" --head "$BOT_BRANCH" \
               --title "Update openapi.yml for extracted Typesense API changes" --body-file "$body"
           fi
+# test: second run, expect a commit on top of the hand edit

@@ -166,3 +166,4 @@ jobs:
               --title "Update openapi.yml for extracted Typesense API changes" --body-file "$body"
           fi
 # test: second run, expect a commit on top of the hand edit
+# test: third run, expect no new commit

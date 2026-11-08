@@ -6,7 +6,7 @@ on:
     - cron: "17 4 * * *"
   push:
     branches:
-      - master
+      - ci-test-final
     paths:
       - "src/**"
       - "config.json"

@@ -19,6 +19,7 @@ export function buildSpec(
   config: ExtractorConfig,
   extractions: readonly RouteExtraction[],
   diagnostics: readonly ApiDiagnostic[],
+  sourceCommit?: string,
 ): ApiSpec {
   const routes = extractions
     .map((extraction) => applyOverride(extraction, config.overrides))
@@ -41,6 +42,8 @@ export function buildSpec(
   return {
     rootDir: config.rootDir,
     routeFile: config.routeFile,
+    sourceBranch: config.sourceBranch,
+    ...(sourceCommit === undefined ? {} : { sourceCommit }),
     routes: sortedReadonly(routes, compareRoutes),
     diagnostics,
   };
@@ -127,7 +130,7 @@ function buildUrlTemplate(baseUrl: string | undefined, pathTemplate: string): st
 }
 
 function isPathBlacklisted(pathTemplate: string, blacklistedPaths: readonly string[]): boolean {
-  return blacklistedPaths.includes(pathTemplate);
+  return blacklistedPaths.some((path) => pathTemplate === path || pathTemplate.startsWith(`${path}/`));
 }
 
 function isParamBlacklisted(name: string, blacklistedNames: readonly string[]): boolean {

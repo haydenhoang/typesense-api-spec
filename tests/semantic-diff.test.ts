@@ -14,22 +14,33 @@ interface RouteInput {
   readonly body?: Readonly<Record<string, string>>;
 }
 
-const toParams = (values: Readonly<Record<string, string>> = {}) =>
-  Object.entries(values).map(([canonicalPath, valueType]) => ({ canonicalPath, valueType }));
+const RAW = "https://raw.githubusercontent.com/typesense/typesense/v31/src";
+const BLOB = "https://github.com/typesense/typesense/blob";
+
+const toParams = (location: string, values: Readonly<Record<string, string>> = {}) =>
+  Object.entries(values).map(([canonicalPath, valueType]) => ({
+    canonicalPath,
+    location,
+    valueType,
+    sources: [{ filePath: `${RAW}/${canonicalPath}.cpp`, line: 7, column: 1 }],
+  }));
 
 let fileCounter = 0;
-const writeSpec = async (routes: readonly RouteInput[]): Promise<string> => {
+const writeSpec = async (routes: readonly RouteInput[], sourceCommit?: string): Promise<string> => {
   fileCounter += 1;
   const filePath = path.join(await dirPromise, `spec-${fileCounter}.json`);
   await writeFile(
     filePath,
     JSON.stringify({
+      sourceBranch: "v31",
+      sourceCommit,
       routes: routes.map((route) => ({
         method: route.method ?? "GET",
         pathTemplate: route.path,
         pathParams: [],
-        queryParams: toParams(route.query),
-        bodyParams: toParams(route.body),
+        queryParams: toParams("query", route.query),
+        bodyParams: toParams("body", route.body),
+        source: { filePath: `${RAW}/server.cpp`, line: 3, column: 1 },
       })),
     }),
   );
@@ -107,6 +118,48 @@ describe("runSemanticDiff", () => {
     expect(markdown).toContain("- Added parameter: body:fresh");
     expect(markdown).toContain("- Removed parameter: body:old");
     expect(markdown).toContain("- Changed parameter type: body:x (string -> integer)");
+  });
+
+  const markdownFor = async (
+    previous: readonly RouteInput[],
+    previousCommit: string | undefined,
+    next: readonly RouteInput[],
+    nextCommit: string | undefined,
+  ): Promise<string> => {
+    const markdownOutputPath = path.join(await dirPromise, `links-${String(fileCounter)}.md`);
+    await runSemanticDiff({
+      previousPath: await writeSpec(previous, previousCommit),
+      nextPath: await writeSpec(next, nextCommit),
+      jsonOutputPath: undefined,
+      markdownOutputPath,
+    });
+    return readFile(markdownOutputPath, "utf8");
+  };
+
+  test("links the Typesense commit range and each change's source at the right commit", async () => {
+    const markdown = await markdownFor(
+      [{ path: "/gone" }, { path: "/a", body: { old: "string" } }],
+      "aaaaaaa1111",
+      [{ path: "/new" }, { path: "/a", body: { fresh: "string" } }],
+      "bbbbbbb2222",
+    );
+    expect(markdown).toContain(
+      "Typesense `v31`: [`aaaaaaa...bbbbbbb`](https://github.com/typesense/typesense/compare/aaaaaaa1111...bbbbbbb2222)",
+    );
+    expect(markdown).toContain(`- GET /new ([src/server.cpp:3](${BLOB}/bbbbbbb2222/src/server.cpp#L3))`);
+    expect(markdown).toContain(`- GET /gone ([src/server.cpp:3](${BLOB}/aaaaaaa1111/src/server.cpp#L3))`);
+    expect(markdown).toContain(`- Added parameter: body:fresh ([src/fresh.cpp:7](${BLOB}/bbbbbbb2222/src/fresh.cpp#L7))`);
+    expect(markdown).toContain(`- Removed parameter: body:old ([src/old.cpp:7](${BLOB}/aaaaaaa1111/src/old.cpp#L7))`);
+  });
+
+  test("says when the changes can't have come from Typesense", async () => {
+    const markdown = await markdownFor([], "aaaaaaa1111", [{ path: "/new" }], "aaaaaaa1111");
+    expect(markdown).toContain("not from Typesense");
+  });
+
+  test("handles a previous spec written before commits were recorded", async () => {
+    const markdown = await markdownFor([], undefined, [{ path: "/new" }], "bbbbbbb2222");
+    expect(markdown).toContain("[`bbbbbbb`](https://github.com/typesense/typesense/commit/bbbbbbb2222)");
   });
 
   test("says when nothing needs an openapi.yml update", async () => {

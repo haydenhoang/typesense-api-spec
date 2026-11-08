@@ -1,10 +1,12 @@
 import { readTextFile, writeTextFile } from "./fs.js";
+import { githubBlobUrl, githubCommitRangeUrl, githubCommitUrl } from "./source.js";
 import type {
   ApiParameterSpec,
   ApiRouteSpec,
   ApiSpec,
   HttpMethod,
   ParameterLocation,
+  SourceLocation,
   ValueType,
 } from "./types.js";
 
@@ -47,7 +49,7 @@ export async function runSemanticDiff(options: {
     await writeTextFile(options.jsonOutputPath, `${JSON.stringify(summary, null, 2)}\n`);
   }
   if (options.markdownOutputPath !== undefined) {
-    await writeTextFile(options.markdownOutputPath, renderMarkdown(summary));
+    await writeTextFile(options.markdownOutputPath, renderMarkdown(summary, previous, next));
   }
 
   return summary;
@@ -161,7 +163,7 @@ function buildParameterKey(location: ParameterLocation, parameter: ApiParameterS
   return `${location}:${parameter.canonicalPath}`;
 }
 
-function renderMarkdown(summary: DiffSummary): string {
+function renderMarkdown(summary: DiffSummary, previous: ApiSpec, next: ApiSpec): string {
   if (!summary.changed) {
     return [
       "# Typesense API extraction changed",
@@ -171,46 +173,102 @@ function renderMarkdown(summary: DiffSummary): string {
     ].join("\n");
   }
 
+  const previousSources = new SourceLinks(previous);
+  const nextSources = new SourceLinks(next);
   const lines = [
-    "# Update `openapi.yml` for extracted API changes",
+    renderSourceRange(previous, next),
     "",
-    "The latest committed extractor output includes API-shape changes compared with the previous committed JSON.",
+    "Check each change against its linked source, then update `openapi.yml` on this branch. Parameter names are usually right, but types are inferred, and the server reading a parameter doesn't make it public.",
     "",
   ];
 
   if (summary.addedRoutes.length > 0) {
     lines.push("## Added routes", "");
-    lines.push(...summary.addedRoutes.map((routeKey) => `- ${routeKey}`), "");
+    lines.push(...summary.addedRoutes.map((routeKey) => `- ${routeKey}${nextSources.forRoute(routeKey)}`), "");
   }
 
   if (summary.removedRoutes.length > 0) {
     lines.push("## Removed routes", "");
-    lines.push(...summary.removedRoutes.map((routeKey) => `- ${routeKey}`), "");
+    lines.push(...summary.removedRoutes.map((routeKey) => `- ${routeKey}${previousSources.forRoute(routeKey)}`), "");
   }
 
   if (summary.changedRoutes.length > 0) {
     lines.push("## Changed routes", "");
     summary.changedRoutes.forEach((route) => {
       lines.push(`### ${route.routeKey}`, "");
-      if (route.addedParams.length > 0) {
-        lines.push(...route.addedParams.map((parameter) => `- Added parameter: ${parameter}`));
-      }
-      if (route.removedParams.length > 0) {
-        lines.push(...route.removedParams.map((parameter) => `- Removed parameter: ${parameter}`));
-      }
-      if (route.changedParamTypes.length > 0) {
-        lines.push(
-          ...route.changedParamTypes.map(
-            (change) =>
-              `- Changed parameter type: ${change.parameterKey} (${formatType(change.previousType)} -> ${formatType(change.nextType)})`,
-          ),
-        );
-      }
+      lines.push(
+        ...route.addedParams.map(
+          (parameter) => `- Added parameter: ${parameter}${nextSources.forParameter(route.routeKey, parameter)}`,
+        ),
+        ...route.removedParams.map(
+          (parameter) => `- Removed parameter: ${parameter}${previousSources.forParameter(route.routeKey, parameter)}`,
+        ),
+        ...route.changedParamTypes.map(
+          (change) =>
+            `- Changed parameter type: ${change.parameterKey} (${formatType(change.previousType)} -> ${formatType(change.nextType)})${nextSources.forParameter(route.routeKey, change.parameterKey)}`,
+        ),
+      );
       lines.push("");
     });
   }
 
   return `${lines.join("\n").trimEnd()}\n`;
+}
+
+/** Which Typesense commits the changes came from. */
+function renderSourceRange(previous: ApiSpec, next: ApiSpec): string {
+  const branch = next.sourceBranch === undefined ? "Typesense" : `Typesense \`${next.sourceBranch}\``;
+  if (next.sourceCommit === undefined) {
+    return `${branch}: source commit unknown.`;
+  }
+  const nextShort = shortCommit(next.sourceCommit);
+  if (previous.sourceCommit === undefined) {
+    return `${branch}: [\`${nextShort}\`](${githubCommitUrl(next.sourceCommit)})`;
+  }
+  if (previous.sourceCommit === next.sourceCommit) {
+    return `${branch}: still at [\`${nextShort}\`](${githubCommitUrl(next.sourceCommit)}), so these changes come from the extractor or its config, not from Typesense.`;
+  }
+  const range = `${shortCommit(previous.sourceCommit)}...${nextShort}`;
+  return `${branch}: [\`${range}\`](${githubCommitRangeUrl(previous.sourceCommit, next.sourceCommit)})`;
+}
+
+function shortCommit(commit: string): string {
+  return commit.slice(0, 7);
+}
+
+/** Renders ` ([src/file.cpp:12](url))` for the source of a route or parameter. */
+class SourceLinks {
+  readonly #commit: string | undefined;
+  readonly #routes: ReadonlyMap<string, ApiRouteSpec>;
+
+  constructor(spec: ApiSpec) {
+    this.#commit = spec.sourceCommit;
+    this.#routes = new Map(spec.routes.map((route) => [buildRouteKey(route.method, route.pathTemplate), route]));
+  }
+
+  forRoute(routeKey: string): string {
+    return this.#render(this.#routes.get(routeKey)?.source);
+  }
+
+  forParameter(routeKey: string, parameterKey: string): string {
+    const route = this.#routes.get(routeKey);
+    if (route === undefined) {
+      return "";
+    }
+    const parameter = [...route.pathParams, ...route.queryParams, ...route.bodyParams].find(
+      (candidate) => buildParameterKey(candidate.location, candidate) === parameterKey,
+    );
+    return this.#render(parameter?.sources[0]);
+  }
+
+  #render(source: SourceLocation | undefined): string {
+    const url = source === undefined ? undefined : githubBlobUrl(source.filePath, source.line, this.#commit);
+    if (source === undefined || url === undefined) {
+      return "";
+    }
+    const filePath = new URL(url).pathname.split("/").slice(5).join("/");
+    return ` ([${filePath}:${String(source.line)}](${url}))`;
+  }
 }
 
 function formatType(valueType: ValueType | undefined): string {

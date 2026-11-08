@@ -103,6 +103,21 @@ describe("buildSpec", () => {
     expect(names(spec.routes[0]?.bodyParams)).toEqual(["ok"]);
   });
 
+  test("a blacklisted path covers its subpaths, not paths that only share a prefix", () => {
+    const spec = buildSpec(
+      { ...baseConfig, blacklist: { paths: ["/limits"], params: [] } },
+      [extraction("/limits"), extraction("/limits/:id"), extraction("/limits/active/:id"), extraction("/limits_other")],
+      [],
+    );
+    expect(spec.routes.map((route) => route.pathTemplate)).toEqual(["/limits_other"]);
+  });
+
+  test("records the source branch and commit", () => {
+    const spec = buildSpec({ ...baseConfig, sourceBranch: "v31" }, [], [], "abc123");
+    expect(spec.sourceBranch).toBe("v31");
+    expect(spec.sourceCommit).toBe("abc123");
+  });
+
   test("override skip removes a route, optionally for one method only", () => {
     const spec = buildSpec(
       { ...baseConfig, overrides: [{ path: "/a", method: "POST", skip: true }] },

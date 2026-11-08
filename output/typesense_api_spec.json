@@ -1,6 +1,8 @@
 {
   "rootDir": "",
   "routeFile": "src/main/typesense_server.cpp",
+  "sourceBranch": "v30",
+  "sourceCommit": "d45d46baf3996d1de8bf96a87f375cfb43691560",
   "routes": [
     {
       "method": "GET",
@@ -1555,8 +1557,8 @@
           "sources": [
             {
               "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
-              "line": 405,
-              "column": 12
+              "line": 385,
+              "column": 13
             }
           ]
         },
@@ -1568,8 +1570,8 @@
           "sources": [
             {
               "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
-              "line": 409,
-              "column": 12
+              "line": 391,
+              "column": 13
             }
           ]
         },
@@ -1609,19 +1611,6 @@
               "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
               "line": 474,
               "column": 76
-            }
-          ]
-        },
-        {
-          "name": "model_config",
-          "canonicalPath": "fields[].model_config",
-          "location": "body",
-          "valueType": "object",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
-              "line": 66,
-              "column": 9
             }
           ]
         },
@@ -2460,8 +2449,8 @@
           "sources": [
             {
               "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
-              "line": 405,
-              "column": 12
+              "line": 385,
+              "column": 13
             }
           ]
         },
@@ -2473,8 +2462,8 @@
           "sources": [
             {
               "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
-              "line": 409,
-              "column": 12
+              "line": 391,
+              "column": 13
             }
           ]
         },
@@ -2514,19 +2503,6 @@
               "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
               "line": 474,
               "column": 76
-            }
-          ]
-        },
-        {
-          "name": "model_config",
-          "canonicalPath": "fields[].model_config",
-          "location": "body",
-          "valueType": "object",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/field.cpp",
-              "line": 66,
-              "column": 9
             }
           ]
         },
@@ -6556,292 +6532,6 @@
       "source": {
         "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
         "line": 54,
-        "column": 5
-      },
-      "diagnostics": []
-    },
-    {
-      "method": "DELETE",
-      "pathTemplate": "/limits/:id",
-      "handler": "del_rate_limit",
-      "pathParams": [
-        {
-          "name": "id",
-          "canonicalPath": "id",
-          "location": "path",
-          "valueType": "string",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/core_api.cpp",
-              "line": 2787,
-              "column": 31
-            }
-          ]
-        }
-      ],
-      "queryParams": [],
-      "bodyParams": [],
-      "source": {
-        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
-        "line": 140,
-        "column": 5
-      },
-      "diagnostics": []
-    },
-    {
-      "method": "GET",
-      "pathTemplate": "/limits/:id",
-      "handler": "get_rate_limit",
-      "pathParams": [
-        {
-          "name": "id",
-          "canonicalPath": "id",
-          "location": "path",
-          "valueType": "string",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/core_api.cpp",
-              "line": 2741,
-              "column": 31
-            }
-          ]
-        }
-      ],
-      "queryParams": [],
-      "bodyParams": [],
-      "source": {
-        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
-        "line": 137,
-        "column": 5
-      },
-      "diagnostics": []
-    },
-    {
-      "method": "PUT",
-      "pathTemplate": "/limits/:id",
-      "handler": "put_rate_limit",
-      "pathParams": [
-        {
-          "name": "id",
-          "canonicalPath": "id",
-          "location": "path",
-          "valueType": "string",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/core_api.cpp",
-              "line": 2760,
-              "column": 31
-            }
-          ]
-        }
-      ],
-      "queryParams": [],
-      "bodyParams": [
-        {
-          "name": "action",
-          "canonicalPath": "action",
-          "location": "body",
-          "valueType": "string",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 454,
-              "column": 62
-            }
-          ]
-        },
-        {
-          "name": "api_keys",
-          "canonicalPath": "api_keys",
-          "location": "body",
-          "valueType": "string[]",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 461,
-              "column": 34
-            }
-          ]
-        },
-        {
-          "name": "apply_limit_per_entity",
-          "canonicalPath": "apply_limit_per_entity",
-          "location": "body",
-          "valueType": "boolean",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 476,
-              "column": 43
-            }
-          ]
-        },
-        {
-          "name": "auto_ban_1m_duration_hours",
-          "canonicalPath": "auto_ban_1m_duration_hours",
-          "location": "body",
-          "valueType": "integer",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 473,
-              "column": 47
-            }
-          ]
-        },
-        {
-          "name": "auto_ban_1m_threshold",
-          "canonicalPath": "auto_ban_1m_threshold",
-          "location": "body",
-          "valueType": "integer",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 472,
-              "column": 42
-            }
-          ]
-        },
-        {
-          "name": "ip_addresses",
-          "canonicalPath": "ip_addresses",
-          "location": "body",
-          "valueType": "string[]",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 456,
-              "column": 29
-            }
-          ]
-        },
-        {
-          "name": "max_requests_1h",
-          "canonicalPath": "max_requests_1h",
-          "location": "body",
-          "valueType": "integer",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 469,
-              "column": 48
-            }
-          ]
-        },
-        {
-          "name": "max_requests_1m",
-          "canonicalPath": "max_requests_1m",
-          "location": "body",
-          "valueType": "integer",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 466,
-              "column": 50
-            }
-          ]
-        },
-        {
-          "name": "priority",
-          "canonicalPath": "priority",
-          "location": "body",
-          "valueType": "unknown",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/ratelimit_manager.cpp",
-              "line": 479,
-              "column": 29
-            }
-          ]
-        }
-      ],
-      "source": {
-        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
-        "line": 139,
-        "column": 5
-      },
-      "diagnostics": []
-    },
-    {
-      "method": "GET",
-      "pathTemplate": "/limits/active",
-      "handler": "get_active_throttles",
-      "pathParams": [],
-      "queryParams": [],
-      "bodyParams": [],
-      "source": {
-        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
-        "line": 135,
-        "column": 5
-      },
-      "diagnostics": []
-    },
-    {
-      "method": "DELETE",
-      "pathTemplate": "/limits/active/:id",
-      "handler": "del_throttle",
-      "pathParams": [
-        {
-          "name": "id",
-          "canonicalPath": "id",
-          "location": "path",
-          "valueType": "string",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/core_api.cpp",
-              "line": 2836,
-              "column": 31
-            }
-          ]
-        }
-      ],
-      "queryParams": [],
-      "bodyParams": [],
-      "source": {
-        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
-        "line": 141,
-        "column": 5
-      },
-      "diagnostics": []
-    },
-    {
-      "method": "GET",
-      "pathTemplate": "/limits/exceeds",
-      "handler": "get_limit_exceed_counts",
-      "pathParams": [],
-      "queryParams": [],
-      "bodyParams": [],
-      "source": {
-        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
-        "line": 136,
-        "column": 5
-      },
-      "diagnostics": []
-    },
-    {
-      "method": "DELETE",
-      "pathTemplate": "/limits/exceeds/:id",
-      "handler": "del_exceed",
-      "pathParams": [
-        {
-          "name": "id",
-          "canonicalPath": "id",
-          "location": "path",
-          "valueType": "string",
-          "sources": [
-            {
-              "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/core_api.cpp",
-              "line": 2854,
-              "column": 31
-            }
-          ]
-        }
-      ],
-      "queryParams": [],
-      "bodyParams": [],
-      "source": {
-        "filePath": "https://raw.githubusercontent.com/typesense/typesense/v30/src/main/typesense_server.cpp",
-        "line": 142,
         "column": 5
       },
       "diagnostics": []
